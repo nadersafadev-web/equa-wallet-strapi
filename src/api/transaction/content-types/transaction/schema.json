@@ -7,7 +7,7 @@
     "displayName": "Transaction"
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
@@ -16,11 +16,9 @@
     },
     "currency": {
       "type": "enumeration",
-      "enum": [
-        "EGP",
-        "USD",
-        "EUR"
-      ]
+      "required": true,
+      "default": "USD",
+      "enum": ["USD", "EUR", "EGP", "GBP", "JPY", "CAD", "AUD", "CHF"]
     },
     "amount": {
       "type": "decimal",
@@ -32,23 +30,54 @@
       "type": "enumeration",
       "required": true,
       "default": "expense",
-      "enum": [
-        "income",
-        "expense"
-      ]
+      "enum": ["income", "expense"]
     },
-    "tag": {
+    "budgetCategory": {
       "type": "enumeration",
       "required": true,
       "default": "needs",
-      "enum": [
-        "needs",
-        "wants",
-        "investments"
-      ]
+      "enum": ["needs", "wants", "investments"]
     },
     "description": {
       "type": "text"
+    },
+    "date": {
+      "type": "datetime",
+      "required": true
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "account": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::account.account",
+      "inversedBy": "transactions"
+    },
+    "category": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::category.category",
+      "inversedBy": "transactions"
+    },
+    "transfer": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::transfer.transfer",
+      "inversedBy": "feeTransactions"
+    },
+    "isRecurring": {
+      "type": "boolean",
+      "default": false
+    },
+    "recurringInterval": {
+      "type": "enumeration",
+      "enum": ["weekly", "monthly", "yearly"]
+    },
+    "nextRecurringDate": {
+      "type": "datetime"
     }
   }
 }

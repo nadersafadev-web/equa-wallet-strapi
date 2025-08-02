@@ -373,19 +373,18 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiTransactionTransaction extends Struct.CollectionTypeSchema {
-  collectionName: 'transactions';
+export interface ApiAccountAccount extends Struct.CollectionTypeSchema {
+  collectionName: 'accounts';
   info: {
-    displayName: 'Transaction';
-    pluralName: 'transactions';
-    singularName: 'transaction';
+    displayName: 'Account';
+    pluralName: 'accounts';
+    singularName: 'account';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
-    amount: Schema.Attribute.Decimal &
-      Schema.Attribute.Required &
+    balance: Schema.Attribute.Decimal &
       Schema.Attribute.SetMinMax<
         {
           min: 0;
@@ -396,25 +395,224 @@ export interface ApiTransactionTransaction extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    currency: Schema.Attribute.Enumeration<['EGP', 'USD', 'EUR']>;
+    currency: Schema.Attribute.Enumeration<
+      ['USD', 'EUR', 'EGP', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'USD'>;
+    fromTransfers: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::transfer.transfer'
+    >;
+    isActive: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::account.account'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    toTransfers: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::transfer.transfer'
+    >;
+    transactions: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::transaction.transaction'
+    >;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
+export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
+  collectionName: 'categories';
+  info: {
+    displayName: 'Category';
+    pluralName: 'categories';
+    singularName: 'category';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    color: Schema.Attribute.String & Schema.Attribute.DefaultTo<'#3B82F6'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    icon: Schema.Attribute.String & Schema.Attribute.DefaultTo<'\uD83D\uDCC1'>;
+    isDefault: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::category.category'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    transactions: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::transaction.transaction'
+    >;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
+export interface ApiTransactionTransaction extends Struct.CollectionTypeSchema {
+  collectionName: 'transactions';
+  info: {
+    displayName: 'Transaction';
+    pluralName: 'transactions';
+    singularName: 'transaction';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    account: Schema.Attribute.Relation<'manyToOne', 'api::account.account'>;
+    amount: Schema.Attribute.Decimal &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<0>;
+    budgetCategory: Schema.Attribute.Enumeration<
+      ['needs', 'wants', 'investments']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'needs'>;
+    category: Schema.Attribute.Relation<'manyToOne', 'api::category.category'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    currency: Schema.Attribute.Enumeration<
+      ['USD', 'EUR', 'EGP', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'USD'>;
+    date: Schema.Attribute.DateTime & Schema.Attribute.Required;
     description: Schema.Attribute.Text;
+    isRecurring: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::transaction.transaction'
     > &
       Schema.Attribute.Private;
+    nextRecurringDate: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
+    recurringInterval: Schema.Attribute.Enumeration<
+      ['weekly', 'monthly', 'yearly']
+    >;
     store: Schema.Attribute.String;
-    tag: Schema.Attribute.Enumeration<['needs', 'wants', 'investments']> &
-      Schema.Attribute.Required &
-      Schema.Attribute.DefaultTo<'needs'>;
+    transfer: Schema.Attribute.Relation<'manyToOne', 'api::transfer.transfer'>;
     type: Schema.Attribute.Enumeration<['income', 'expense']> &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'expense'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
+export interface ApiTransferTransfer extends Struct.CollectionTypeSchema {
+  collectionName: 'transfers';
+  info: {
+    displayName: 'Transfer';
+    pluralName: 'transfers';
+    singularName: 'transfer';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    amount: Schema.Attribute.Decimal &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
+    convertedAmount: Schema.Attribute.Decimal &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
+    convertedCurrency: Schema.Attribute.Enumeration<
+      ['USD', 'EUR', 'EGP', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF']
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    currency: Schema.Attribute.Enumeration<
+      ['USD', 'EUR', 'EGP', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'USD'>;
+    date: Schema.Attribute.DateTime & Schema.Attribute.Required;
+    feeAmount: Schema.Attribute.Decimal &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<0>;
+    feeCurrency: Schema.Attribute.Enumeration<
+      ['USD', 'EUR', 'EGP', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF']
+    > &
+      Schema.Attribute.DefaultTo<'USD'>;
+    feeNote: Schema.Attribute.Text;
+    feeTransactions: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::transaction.transaction'
+    >;
+    fromAccount: Schema.Attribute.Relation<'manyToOne', 'api::account.account'>;
+    fxRate: Schema.Attribute.Decimal &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::transfer.transfer'
+    > &
+      Schema.Attribute.Private;
+    note: Schema.Attribute.Text;
+    publishedAt: Schema.Attribute.DateTime;
+    toAccount: Schema.Attribute.Relation<'manyToOne', 'api::account.account'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
   };
 }
 
@@ -927,7 +1125,10 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::account.account': ApiAccountAccount;
+      'api::category.category': ApiCategoryCategory;
       'api::transaction.transaction': ApiTransactionTransaction;
+      'api::transfer.transfer': ApiTransferTransfer;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

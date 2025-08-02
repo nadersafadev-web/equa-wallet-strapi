@@ -1,0 +1,81 @@
+{
+  "kind": "collectionType",
+  "collectionName": "transfers",
+  "info": {
+    "singularName": "transfer",
+    "pluralName": "transfers",
+    "displayName": "Transfer"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "amount": {
+      "type": "decimal",
+      "required": true,
+      "min": 0
+    },
+    "currency": {
+      "type": "enumeration",
+      "required": true,
+      "default": "USD",
+      "enum": ["USD", "EUR", "EGP", "GBP", "JPY", "CAD", "AUD", "CHF"]
+    },
+    "convertedAmount": {
+      "type": "decimal",
+      "min": 0
+    },
+    "convertedCurrency": {
+      "type": "enumeration",
+      "enum": ["USD", "EUR", "EGP", "GBP", "JPY", "CAD", "AUD", "CHF"]
+    },
+    "fxRate": {
+      "type": "decimal",
+      "min": 0
+    },
+    "feeAmount": {
+      "type": "decimal",
+      "default": 0,
+      "min": 0
+    },
+    "feeCurrency": {
+      "type": "enumeration",
+      "default": "USD",
+      "enum": ["USD", "EUR", "EGP", "GBP", "JPY", "CAD", "AUD", "CHF"]
+    },
+    "feeNote": {
+      "type": "text"
+    },
+    "note": {
+      "type": "text"
+    },
+    "date": {
+      "type": "datetime",
+      "required": true
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "fromAccount": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::account.account",
+      "inversedBy": "fromTransfers"
+    },
+    "toAccount": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::account.account",
+      "inversedBy": "toTransfers"
+    },
+    "feeTransactions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::transaction.transaction",
+      "mappedBy": "transfer"
+    }
+  }
+}

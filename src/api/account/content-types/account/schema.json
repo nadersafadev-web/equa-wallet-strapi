@@ -1,0 +1,57 @@
+{
+  "kind": "collectionType",
+  "collectionName": "accounts",
+  "info": {
+    "singularName": "account",
+    "pluralName": "accounts",
+    "displayName": "Account"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "currency": {
+      "type": "enumeration",
+      "required": true,
+      "default": "USD",
+      "enum": ["USD", "EUR", "EGP", "GBP", "JPY", "CAD", "AUD", "CHF"]
+    },
+    "balance": {
+      "type": "decimal",
+      "default": 0,
+      "min": 0
+    },
+    "isActive": {
+      "type": "boolean",
+      "default": true
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "transactions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::transaction.transaction",
+      "mappedBy": "account"
+    },
+    "fromTransfers": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::transfer.transfer",
+      "mappedBy": "fromAccount"
+    },
+    "toTransfers": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::transfer.transfer",
+      "mappedBy": "toAccount"
+    }
+  }
+}
