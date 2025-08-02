@@ -1,0 +1,54 @@
+{
+  "kind": "collectionType",
+  "collectionName": "transactions",
+  "info": {
+    "singularName": "transaction",
+    "pluralName": "transactions",
+    "displayName": "Transaction"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "store": {
+      "type": "string"
+    },
+    "currency": {
+      "type": "enumeration",
+      "enum": [
+        "EGP",
+        "USD",
+        "EUR"
+      ]
+    },
+    "amount": {
+      "type": "decimal",
+      "required": true,
+      "default": 0,
+      "min": 0
+    },
+    "type": {
+      "type": "enumeration",
+      "required": true,
+      "default": "expense",
+      "enum": [
+        "income",
+        "expense"
+      ]
+    },
+    "tag": {
+      "type": "enumeration",
+      "required": true,
+      "default": "needs",
+      "enum": [
+        "needs",
+        "wants",
+        "investments"
+      ]
+    },
+    "description": {
+      "type": "text"
+    }
+  }
+}
