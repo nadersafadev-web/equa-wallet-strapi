@@ -16,10 +16,7 @@ export default factories.createCoreRouter('api::transaction.transaction', {
       middlewares: ['api::transaction.owner-filter'],
     },
     update: {
-      middlewares: [
-        'api::transaction.owner-filter',
-        'api::transaction.owner-assign',
-      ],
+      middlewares: ['api::transaction.owner-filter'],
     },
     delete: {
       middlewares: ['api::transaction.owner-filter'],

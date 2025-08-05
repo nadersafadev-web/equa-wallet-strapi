@@ -11,28 +11,6 @@ export default factories.createCoreController(
       try {
         const { data } = ctx.request.body
 
-        // Handle the owner relation properly
-        if (data.owner) {
-          // If owner is a string ID, convert it to the proper relation format
-          if (typeof data.owner === 'string') {
-            data.owner = {
-              connect: [data.owner],
-            }
-          }
-          // If owner is already an object with connect/set, keep it as is
-          else if (
-            typeof data.owner === 'object' &&
-            !data.owner.connect &&
-            !data.owner.set
-          ) {
-            // If it's an object but not in the right format, assume it's an ID
-            data.owner = {
-              connect: [data.owner],
-            }
-          }
-        }
-
-        // Use Document Service instead of Entity Service
         const result = await strapi
           .documents('api::transaction.transaction')
           .create({
@@ -42,7 +20,9 @@ export default factories.createCoreController(
 
         return result
       } catch (error) {
-        ctx.throw(400, error.message)
+        const status = error.status || 400
+        const message = error.message || 'Failed to create transaction'
+        ctx.throw(status, message)
       }
     },
 
@@ -51,28 +31,22 @@ export default factories.createCoreController(
         const { id } = ctx.params
         const { data } = ctx.request.body
 
-        // Handle the owner relation properly
-        if (data.owner) {
-          // If owner is a string ID, convert it to the proper relation format
-          if (typeof data.owner === 'string') {
-            data.owner = {
-              connect: [data.owner],
-            }
-          }
-          // If owner is already an object with connect/set, keep it as is
-          else if (
-            typeof data.owner === 'object' &&
-            !data.owner.connect &&
-            !data.owner.set
-          ) {
-            // If it's an object but not in the right format, assume it's an ID
-            data.owner = {
-              connect: [data.owner],
-            }
-          }
+        // First find the transaction to verify ownership
+        const existingTransaction = await strapi
+          .documents('api::transaction.transaction')
+          .findOne({
+            documentId: id,
+            populate: ['owner'],
+            filters: ctx.query.filters,
+          })
+
+        if (
+          !existingTransaction ||
+          existingTransaction.owner.documentId !== ctx.state.user.documentId
+        ) {
+          ctx.throw(403, 'You are not authorized to update this transaction')
         }
 
-        // Use Document Service instead of Entity Service
         const result = await strapi
           .documents('api::transaction.transaction')
           .update({
@@ -84,7 +58,9 @@ export default factories.createCoreController(
 
         return result
       } catch (error) {
-        ctx.throw(400, error.message)
+        const status = error.status || 400
+        const message = error.message || 'Failed to update transaction'
+        ctx.throw(status, message)
       }
     },
 
@@ -105,7 +81,9 @@ export default factories.createCoreController(
 
         return result
       } catch (error) {
-        ctx.throw(error.status || 400, error.message)
+        const status = error.status || 400
+        const message = error.message || 'Failed to find transaction'
+        ctx.throw(status, message)
       }
     },
 
@@ -125,7 +103,9 @@ export default factories.createCoreController(
 
         return result
       } catch (error) {
-        ctx.throw(400, error.message)
+        const status = error.status || 400
+        const message = error.message || 'Failed to find transactions'
+        ctx.throw(status, message)
       }
     },
 
@@ -146,7 +126,9 @@ export default factories.createCoreController(
 
         return deleted
       } catch (error) {
-        ctx.throw(error.status || 400, error.message)
+        const status = error.status || 400
+        const message = error.message || 'Failed to delete transaction'
+        ctx.throw(status, message)
       }
     },
   })
